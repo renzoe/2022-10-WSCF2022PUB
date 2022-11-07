@@ -1,0 +1,28 @@
+{
+	"folders": [
+		{
+			"name": "01-Led",
+			"path": "01-Led"
+		},
+		{
+			"name": "02-WiFiRSSI",
+			"path": "02-WiFiRSSI"
+		},
+		{
+			"name": "03-Sensor",
+			"path": "03-Sensor"
+		},
+		{
+			"name": "10-LoRaWANNode",
+			"path": "10-LoRaWANNode"
+		},
+		{
+			"name": "11-WiFiScanCayenneLPP",
+			"path": "11-WiFiScanCayenneLPP"
+		},
+		{
+			"name": "serial://dev/ttyACM0",
+			"uri": "serial:/dev/ttyacm0"
+		}
+	]
+}

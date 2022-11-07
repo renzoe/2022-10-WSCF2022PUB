@@ -1,0 +1,21 @@
+Intentando una nano-GW en AU915!
+
+242262.912] Received packet: {"rxpk": [{"data": "QH0UASYAPAACz7rID4irELtl6w==", "time": "2022-10-25T09:19:33.733766Z", "chan": 0, "tmst": 23816248, "stat": 1, "modu": "LORA", "lsnr": 8.0, "rssi": -43, "rfch": 0, "codr": "4/5", "freq": 915.2, "datr": "SF9BW125", "size": 19}]}
+[242262.936] Push ack
+[242263.365] Pull rsp
+Unhandled exception in callback handler
+Traceback (most recent call last):
+  File "nanogateway.py", line 438, in <lambda>
+  File "nanogateway.py", line 375, in _send_down_link
+ValueError: frequency 923300000 out of range
+
+
+El downlink del join se hace en otras frequencias (eg. 923300000) que no corresponden a las de uplink, con una nanogw es imposible hacer join :(.
+Tambien tuve que cambiar en chirpstack
+chirpstack-gateway-bridge.toml :
+
+[integration.mqtt]
+event_topic_template="au915_0/gateway/{{ .GatewayID }}/event/{{ .EventType }}"
+state_topic_template="au915_0/gateway/{{ .GatewayID }}/state/{{ .StateType }}"
+command_topic_template="au915_0/gateway/{{ .GatewayID }}/command/#"
+
