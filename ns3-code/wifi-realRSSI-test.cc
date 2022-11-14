@@ -70,10 +70,12 @@ main(int argc, char* argv[])
     // ns-3 Time values which use integers to avoid portability issues.
     
     uint32_t rtsThreshold = 65535;
+    //Posición del AP
     int ap_x = 0;
     int ap_y = 0;
     int ap_z = 0;
     
+    //Posición de la STA
     int sta1_x = 2;
     int sta1_y = 0;      
     int sta1_z = 0;
@@ -115,11 +117,17 @@ main(int argc, char* argv[])
     m_propDelay.SetTypeId ("ns3::ConstantSpeedPropagationDelayModel");
     Ptr<PropagationDelayModel> propDelay = m_propDelay.Create<PropagationDelayModel> ();
     
+    //Modelo de propagación desarrollado en el curso
+    //El RSSI se carga unas líneas mas abajo
     Ptr<RealRSSIPropagationLossModel> propLoss = CreateObject<RealRSSIPropagationLossModel> ();
+    
+    //Modelo de propagación teórico.
+    //Se puede utilizar para comparar los resultados
+    //Ptr<FriisPropagationLossModel> propLoss = CreateObject<FriisPropagationLossModel> ();
+    
     channel->SetPropagationDelayModel (propDelay);
     channel->SetPropagationLossModel (propLoss);
    
-    
     wifiPhy.SetChannel(channel);
 
     NetDeviceContainer wifiApDevices;
@@ -151,8 +159,7 @@ main(int argc, char* argv[])
     Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator>();
     
     // Initial position of AP and STA
-    positionAlloc->Add(Vector(ap_x, ap_y, ap_z));
-    
+    positionAlloc->Add(Vector(ap_x, ap_y, ap_z));    
     positionAlloc->Add(Vector(sta1_x, sta1_y, sta1_z));
     
     mobility.SetPositionAllocator(positionAlloc);
@@ -161,10 +168,27 @@ main(int argc, char* argv[])
     mobility.Install(wifiApNodes.Get(0));
     mobility.Install(wifiStaNodes);
     
+    //////////////////////////////////////////////////////////////////////////////
+    //Configuración del RSSI para el modelo de propagación del curso
+    //Si se desea usar el modelo Friis, todas estas líneas deben ser comentadas.
+    
+    // Cargo el RSSI en la posición (5,0,0) con valor -50
+    // IMPORTANTE: Por cada posición se debe crear un nuevo objeto 'auxMobility'
     Ptr<MobilityModel> auxMobility = CreateObject<ConstantPositionMobilityModel> ();
     auxMobility->SetPosition (Vector (5.0, 0.0, 0.0));
-    propLoss->SetRssi (wifiApNodes.Get (0)->GetObject<MobilityModel> (), auxMobility, -50.0, true);
+    propLoss->SetRssi (wifiApNodes.Get (0)->GetObject<MobilityModel> (), auxMobility, -75.0, false);
 
+    // Cargo el RSSI en la posición (0,5,0) con valor -60
+    Ptr<MobilityModel> auxMobility2 = CreateObject<ConstantPositionMobilityModel> ();    
+    auxMobility2->SetPosition (Vector (0.0, 5.0, 0.0));
+    propLoss->SetRssi (wifiApNodes.Get (0)->GetObject<MobilityModel> (), auxMobility2, -65.0, false);
+    
+    // Cargo el RSSI en la posición (5,5,0) con valor -70    
+    Ptr<MobilityModel> auxMobility3 = CreateObject<ConstantPositionMobilityModel> ();    
+    auxMobility3->SetPosition (Vector (5.0, 5.0, 0.0));
+    propLoss->SetRssi (wifiApNodes.Get (0)->GetObject<MobilityModel> (), auxMobility3, -80.0, false);
+    
+    /////////////////////////////////////////////////////////////////////////////////7
 
     // Configure the IP stack
     InternetStackHelper stack;
@@ -200,6 +224,8 @@ main(int argc, char* argv[])
 
     Simulator::Stop (simTime);
     Simulator::Run ();
+    
+    ///////////////////////////////////////////////////////////////////////////////
 
     // Print per-flow statistics
     

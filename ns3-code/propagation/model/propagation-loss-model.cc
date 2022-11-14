@@ -1030,39 +1030,29 @@ RealRSSIPropagationLossModel::DoCalcRxPower(double txPowerDbm,
 {
 
     double v;
-    std::map<MobilityPair, double>::const_iterator i = m_rssi.begin ();
-    v = i->second;
-    //alglib::idwbuilder builder;
-    //alglib::idwbuildercreate(1, 1, builder);
+    alglib::idwbuilder builder;
+    alglib::idwbuildercreate(3, 1, builder);
 
-    //alglib::real_2d_array xy;
-    //xy.setlength(1,3);
+    alglib::real_2d_array xy;
+    xy.setlength(1,4);
    
-    //for (std::map<MobilityPair, double>::const_iterator i = m_rssi.begin (); i != m_rssi.end (); i++)
-    //{       
-    //    MobilityPair mp = i->first;
-    //    xy[0][0] = std::get<1>(mp)->GetPosition().x;
-    //    xy[0][1] = std::get<1>(mp)->GetPosition().y;
-    //    xy[0][2] = i->second;
-    //    alglib::idwbuildersetpoints(builder, xy);
-    //}
+    for (std::map<MobilityPair, double>::const_iterator i = m_rssi.begin (); i != m_rssi.end (); ++i)
+    {       
+        MobilityPair mp = i->first;
+        xy[0][0] = std::get<1>(mp)->GetPosition().x;
+        xy[0][1] = std::get<1>(mp)->GetPosition().y;
+	    xy[0][2] = std::get<1>(mp)->GetPosition().z;
+        xy[0][3] = i->second;
+        alglib::idwbuildersetpoints(builder, xy);
+    }
     
-    //alglib::idwmodel model;
-    //alglib::idwreport rep;
-    //alglib::idwbuildersetalgomstab(builder, 5.0);
-    //alglib::idwfit(builder, model, rep);
-    //
-    //v = alglib::idwcalc2(model, 1.0, 0.0);
+    alglib::idwmodel model;
+    alglib::idwreport rep;
+    alglib::idwbuildersetalgomstab(builder, 5.0);
+    alglib::idwfit(builder, model, rep);
     
-    //double v;
-    //alglib::spline2dinterpolant s;
-
-    // build spline
-    //alglib::spline2dbuildbilinearv(x, 3, y, 2, f, 1, s);
-
-    // calculate S(0.25,0.50)
-    //v = alglib::spline2dcalc(s, b->GetPosition().x, b->GetPosition().y);
-
+    v = alglib::idwcalc3(model, b->GetPosition().x, b->GetPosition().y, b->GetPosition().z);
+    
     return v;
 }
 
