@@ -1034,18 +1034,20 @@ RealRSSIPropagationLossModel::DoCalcRxPower(double txPowerDbm,
     alglib::idwbuildercreate(3, 1, builder);
 
     alglib::real_2d_array xy;
-    xy.setlength(1,4);
-   
+    xy.setlength(m_rssi.size(),4);
+
+    uint32_t row = 0;
     for (std::map<MobilityPair, double>::const_iterator i = m_rssi.begin (); i != m_rssi.end (); ++i)
     {       
         MobilityPair mp = i->first;
-        xy[0][0] = std::get<1>(mp)->GetPosition().x;
-        xy[0][1] = std::get<1>(mp)->GetPosition().y;
-	    xy[0][2] = std::get<1>(mp)->GetPosition().z;
-        xy[0][3] = i->second;
-        alglib::idwbuildersetpoints(builder, xy);
+        xy[row][0] = std::get<1>(mp)->GetPosition().x;
+        xy[row][1] = std::get<1>(mp)->GetPosition().y;
+	xy[row][2] = std::get<1>(mp)->GetPosition().z;
+        xy[row][3] = i->second;
+	row++;
     }
     
+    alglib::idwbuildersetpoints(builder, xy);
     alglib::idwmodel model;
     alglib::idwreport rep;
     alglib::idwbuildersetalgomstab(builder, 5.0);
